@@ -12,7 +12,17 @@ import { errorHandler } from './middleware/errorHandler';
 export function createApp(): express.Express {
   const app = express();
 
-  app.use(helmet());
+  if (env.nodeEnv === 'production' && env.corsOrigin === '*') {
+    throw new Error(
+      'CORS_ORIGIN must be an explicit comma-separated list of allowed origins in production',
+    );
+  }
+
+  app.use(
+    helmet({
+      crossOriginResourcePolicy: { policy: 'cross-origin' },
+    }),
+  );
 
   if (env.corsOrigin === '*') {
     app.use(cors({ credentials: true, origin: true }));
@@ -37,6 +47,8 @@ export function createApp(): express.Express {
     app.use('/api', rateLimiter);
   }
   app.use('/api', routes);
+
+  app.use('/uploads', express.static(env.uploadDir));
 
   app.use(notFound);
   app.use(errorHandler);

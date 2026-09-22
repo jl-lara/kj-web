@@ -2,6 +2,7 @@ import { Route, Routes } from 'react-router-dom';
 import MainLayout from './layouts/MainLayout.jsx';
 import About from './pages/About.jsx';
 import Contact from './pages/Contact.jsx';
+import Gallery from './pages/Gallery.jsx';
 import Home from './pages/Home.jsx';
 import Locations from './pages/Locations.jsx';
 import Menu from './pages/Menu.jsx';
@@ -18,6 +19,7 @@ export default function App() {
         <Route path="/sucursales" element={<Locations />} />
         <Route path="/historia" element={<About />} />
         <Route path="/promociones" element={<Promotions />} />
+        <Route path="/galeria" element={<Gallery />} />
         <Route path="/contacto" element={<Contact />} />
       </Route>
     </Routes>

@@ -1,6 +1,7 @@
 import { Prisma } from '@prisma/client';
 import { galleryRepository } from '../repositories/gallery.repository';
 import { HttpError } from '../utils/HttpError';
+import { storageService } from './storage.service';
 
 export interface GalleryListQuery {
   page: number;
@@ -69,7 +70,11 @@ export const galleryService = {
     if (Object.keys(data).length === 0) {
       return item;
     }
-    return galleryRepository.update(id, data);
+    const updated = await galleryRepository.update(id, data);
+    if (input.imageUrl !== undefined && input.imageUrl !== item.imageUrl) {
+      await storageService.removeByUrl(item.imageUrl);
+    }
+    return updated;
   },
 
   async updateStatus(id: string, active: boolean) {
@@ -85,6 +90,7 @@ export const galleryService = {
     if (!item) {
       throw new HttpError(404, 'Gallery item not found', 'GALLERY_NOT_FOUND');
     }
-    return galleryRepository.remove(id);
+    await galleryRepository.remove(id);
+    await storageService.removeByUrl(item.imageUrl);
   },
 };

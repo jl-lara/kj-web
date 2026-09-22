@@ -93,6 +93,7 @@ model Promotion {
   title       String
   description String?
   imageUrl    String?
+  price       Decimal?  @db.Decimal(10, 2)
   startsAt    DateTime?
   endsAt      DateTime?
   active      Boolean   @default(true)
@@ -113,4 +114,25 @@ model Gallery {
   updatedAt    DateTime @updatedAt
 
   @@map("gallery")
+}
+
+model SiteSettings {
+  id           String   @id @default(uuid()) @db.Uuid
+  singleton    Int      @unique @default(1)
+  siteName     String   @default("Karnes en su Jugo")
+  description  String?
+  phone        String?
+  whatsapp     String?
+  email        String?
+  address      String?
+  facebook     String?
+  instagram    String?
+  tiktok       String?
+  openingHours String?
+  logoUrl      String?
+  faviconUrl   String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@map("site_settings")
 }

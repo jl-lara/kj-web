@@ -1,13 +1,19 @@
 import PageHero from '../components/PageHero.jsx';
-import { promotions } from '../data/siteData.js';
+import { useSite } from '../context/SiteContext.jsx';
 
 export default function Promotions() {
+  const { promotions, loading } = useSite();
+
   return (
     <>
-      <PageHero eyebrow="Promociones" title="Promociones claras, sin slider automático" text="Cards editoriales con la información publicada actualmente por el sitio de referencia." />
+      <PageHero eyebrow="Promociones" title="Promociones claras, sin slider automático" text="Ofertas vigentes publicadas por el equipo de Karnes en su Jugo." />
       <section className="section">
         <div className="container promo-grid">
-          {promotions.map((promo) => (
+          {loading && <p className="state-text">Cargando promociones…</p>}
+          {!loading && promotions.length === 0 && (
+            <p className="state-text">No hay promociones vigentes por el momento.</p>
+          )}
+          {!loading && promotions.map((promo) => (
             <article className="promo-card" key={promo.name}>
               <img src={promo.image} alt={promo.name} loading="lazy" />
               <div>

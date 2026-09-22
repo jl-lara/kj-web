@@ -7,6 +7,8 @@ import locationRoutes from './location.routes';
 import productRoutes from './product.routes';
 import promotionRoutes from './promotion.routes';
 import userRoutes from './user.routes';
+import uploadRoutes from './upload.routes';
+import settingsRoutes from './settings.routes';
 
 const router = Router();
 
@@ -18,5 +20,7 @@ router.use('/products', productRoutes);
 router.use('/locations', locationRoutes);
 router.use('/promotions', promotionRoutes);
 router.use('/gallery', galleryRoutes);
+router.use('/uploads', uploadRoutes);
+router.use('/settings', settingsRoutes);
 
 export default router;

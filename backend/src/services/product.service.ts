@@ -2,6 +2,7 @@ import { Prisma, Product } from '@prisma/client';
 import { productRepository } from '../repositories/product.repository';
 import { categoryRepository } from '../repositories/category.repository';
 import { HttpError } from '../utils/HttpError';
+import { storageService } from './storage.service';
 
 export interface ProductListQuery {
   page: number;
@@ -104,6 +105,9 @@ export const productService = {
       return serializeProduct(product);
     }
     const updated = await productRepository.update(id, data);
+    if (input.imageUrl !== undefined && input.imageUrl !== product.imageUrl) {
+      await storageService.removeByUrl(product.imageUrl);
+    }
     return serializeProduct(updated);
   },
 
@@ -121,6 +125,7 @@ export const productService = {
     if (!product) {
       throw new HttpError(404, 'Product not found', 'PRODUCT_NOT_FOUND');
     }
-    return productRepository.remove(id);
+    await productRepository.remove(id);
+    await storageService.removeByUrl(product.imageUrl);
   },
 };

@@ -14,6 +14,7 @@ export const navItems = [
   { label: 'Sucursales', path: '/sucursales' },
   { label: 'Nuestra historia', path: '/historia' },
   { label: 'Promociones', path: '/promociones' },
+  { label: 'Galería', path: '/galeria' },
   { label: 'Contacto', path: '/contacto' },
 ];
 

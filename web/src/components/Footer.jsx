@@ -1,10 +1,14 @@
 import { ExternalLink, MapPin, Phone } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { locations, navItems, social } from '../data/siteData.js';
+import { navItems } from '../data/siteData.js';
+import { useSite } from '../context/SiteContext.jsx';
 import logo from '../images/logo-top-portal.png';
 
 export default function Footer() {
-  const mainLocation = locations[0];
+  const { settings, social, locations } = useSite();
+
+  const phone = settings?.phone || locations[0]?.phone || '';
+  const address = settings?.address || locations[0]?.address || '';
 
   return (
     <footer className="footer">
@@ -30,12 +34,20 @@ export default function Footer() {
         </div>
         <div>
           <h2>Contacto</h2>
-          <a href={`tel:${mainLocation.tel}`}><Phone size={16} /> {mainLocation.phone}</a>
-          <span><MapPin size={16} /> {mainLocation.address}</span>
+          {phone && <a href={`tel:${phone}`}><Phone size={16} /> {phone}</a>}
+          {address && <span><MapPin size={16} /> {address}</span>}
         </div>
         <div>
           <h2>Redes</h2>
-          <a href={social.facebook} target="_blank" rel="noreferrer"><ExternalLink size={16} /> Facebook</a>
+          {social.facebook && (
+            <a href={social.facebook} target="_blank" rel="noreferrer"><ExternalLink size={16} /> Facebook</a>
+          )}
+          {social.instagram && (
+            <a href={social.instagram} target="_blank" rel="noreferrer"><ExternalLink size={16} /> Instagram</a>
+          )}
+          {social.tiktok && (
+            <a href={social.tiktok} target="_blank" rel="noreferrer"><ExternalLink size={16} /> TikTok</a>
+          )}
           <span className="legal">Aviso de privacidad</span>
         </div>
       </div>

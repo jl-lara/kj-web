@@ -2,11 +2,14 @@ import { ArrowRight, Clock, MapPin, Utensils } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import MenuCard from '../components/MenuCard.jsx';
 import SectionTitle from '../components/SectionTitle.jsx';
-import { images, locations, menuCategories, promotions, storyParagraphs, timeline } from '../data/siteData.js';
+import { images, storyParagraphs, timeline } from '../data/siteData.js';
+import { useSite } from '../context/SiteContext.jsx';
 import logo from '../images/logo-top-portal.png';
 
 export default function Home() {
-  const signature = menuCategories[0].items[0];
+  const { menuCategories, locations, promotions, loading } = useSite();
+  const signature = menuCategories[0]?.items?.[0];
+  const previewItems = menuCategories.flatMap((category) => category.items.slice(0, 2));
 
   return (
     <>
@@ -29,32 +32,40 @@ export default function Home() {
         <div className="container value-grid">
           <article><strong>1973</strong><span>Origen familiar en Culiacán, Sinaloa</span></article>
           <article><strong>1975</strong><span>Primera sucursal de Tijuana</span></article>
-          <article><strong>5</strong><span>Sucursales documentadas en Tijuana</span></article>
+          <article><strong>{locations.length}</strong><span>Sucursales en Tijuana</span></article>
           <article><strong>KJ</strong><span>Receta con consomé, frijoles y tortillas hechas a mano</span></article>
         </div>
       </section>
 
-      <section className="section signature-section">
-        <div className="container signature-grid">
-          <div className="signature-image">
-            <img src={signature.image} alt={signature.name} />
+      {signature && (
+        <section className="section signature-section">
+          <div className="container signature-grid">
+            <div className="signature-image">
+              <img src={signature.image} alt={signature.name} />
+            </div>
+            <div className="signature-copy">
+              <span className="eyebrow">Platillo insignia</span>
+              <h2>Karnes en su Jugo</h2>
+              <p>{signature.description}</p>
+              <div className="price-tag">{signature.price}</div>
+              <Link className="button" to="/menu">Ver especialidades <ArrowRight size={17} /></Link>
+            </div>
           </div>
-          <div className="signature-copy">
-            <span className="eyebrow">Platillo insignia</span>
-            <h2>Karnes en su Jugo</h2>
-            <p>{signature.description}</p>
-            <div className="price-tag">{signature.price}</div>
-            <Link className="button" to="/menu">Ver especialidades <ArrowRight size={17} /></Link>
-          </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       <section className="section">
         <div className="container">
-          <SectionTitle eyebrow="Menú" title="Sabores de casa, presentados con claridad" text="Una selección inicial basada en las categorías reales del sitio: especialidades, desayuno y comida." />
-          <div className="menu-grid preview-grid">
-            {menuCategories.flatMap((category) => category.items.slice(0, 2)).map((item) => <MenuCard key={`${item.name}-${item.price}`} item={item} />)}
-          </div>
+          <SectionTitle eyebrow="Menú" title="Sabores de casa, presentados con claridad" text="Una selección basada en las categorías reales del sitio, gestionada desde el panel administrativo." />
+          {loading && <p className="state-text">Cargando menú…</p>}
+          {!loading && previewItems.length > 0 && (
+            <div className="menu-grid preview-grid">
+              {previewItems.map((item) => <MenuCard key={`${item.name}-${item.price}`} item={item} />)}
+            </div>
+          )}
+          {!loading && previewItems.length === 0 && (
+            <p className="state-text">El menú aún no está disponible.</p>
+          )}
           <div className="section-cta"><Link className="button button-dark" to="/menu">Explorar menú completo</Link></div>
         </div>
       </section>
@@ -79,23 +90,25 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="section dark-band">
-        <div className="container band-grid">
-          <div>
-            <span className="eyebrow">Promociones</span>
-            <h2>Opciones entre semana</h2>
-            <p>Promociones actuales documentadas en el sitio original, listas para actualizar en futuras etapas.</p>
+      {promotions.length > 0 && (
+        <section className="section dark-band">
+          <div className="container band-grid">
+            <div>
+              <span className="eyebrow">Promociones</span>
+              <h2>Opciones entre semana</h2>
+              <p>Promociones vigentes publicadas por el equipo de Karnes en su Jugo.</p>
+            </div>
+            {promotions.slice(0, 2).map((promo) => (
+              <article className="promo-slim" key={promo.name}>
+                <Clock size={18} />
+                <h3>{promo.name}</h3>
+                <p>{promo.description}</p>
+                {promo.price && <strong>{promo.price}</strong>}
+              </article>
+            ))}
           </div>
-          {promotions.slice(0, 2).map((promo) => (
-            <article className="promo-slim" key={promo.name}>
-              <Clock size={18} />
-              <h3>{promo.name}</h3>
-              <p>{promo.description}</p>
-              <strong>{promo.price}</strong>
-            </article>
-          ))}
-        </div>
-      </section>
+        </section>
+      )}
 
       <section className="section">
         <div className="container">

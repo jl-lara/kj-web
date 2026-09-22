@@ -1,6 +1,6 @@
 import { randomUUID } from 'node:crypto';
 import { HttpError } from '../utils/HttpError';
-import { comparePassword } from '../utils/password';
+import { comparePassword, hashPassword } from '../utils/password';
 import { hashToken } from '../utils/hashToken';
 import {
   refreshTokenTtlSeconds,
@@ -89,5 +89,32 @@ export const authService = {
       throw new HttpError(404, 'User not found', 'USER_NOT_FOUND');
     }
     return toSafeUser(user);
+  },
+
+  async updateProfile(userId: string, name: string): Promise<SafeUser> {
+    const user = await userRepository.findById(userId);
+    if (!user) {
+      throw new HttpError(404, 'User not found', 'USER_NOT_FOUND');
+    }
+    const updated = await userRepository.update(userId, { name });
+    return toSafeUser(updated);
+  },
+
+  async changePassword(
+    userId: string,
+    currentPassword: string,
+    newPassword: string,
+  ): Promise<void> {
+    const user = await userRepository.findById(userId);
+    if (!user || !user.active) {
+      throw new HttpError(401, 'Authentication required', 'UNAUTHORIZED');
+    }
+    const matches = await comparePassword(currentPassword, user.passwordHash);
+    if (!matches) {
+      throw new HttpError(400, 'Current password is incorrect', 'CURRENT_PASSWORD_INCORRECT');
+    }
+    const passwordHash = await hashPassword(newPassword);
+    await userRepository.update(userId, { passwordHash });
+    await refreshTokenRepository.revokeAllForUser(userId);
   },
 };

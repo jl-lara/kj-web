@@ -6,10 +6,16 @@ export const listPromotionsQuerySchema = paginationSchema.extend({
   sort: z.enum(['title', 'startsAt', 'createdAt']).default('createdAt'),
 });
 
+const nullablePriceSchema = z
+  .union([z.number(), z.string(), z.null()])
+  .transform((value) => (value === null || value === '' ? null : Number(value)))
+  .pipe(z.number().min(0, 'Price must be >= 0').nullable());
+
 const basePromotionSchema = z.object({
   title: z.string().trim().min(1).max(200),
   description: z.string().trim().max(1000).optional().nullable(),
   imageUrl: nullableUrlSchema,
+  price: nullablePriceSchema.optional(),
   startsAt: z.coerce.date().optional().nullable(),
   endsAt: z.coerce.date().optional().nullable(),
 });

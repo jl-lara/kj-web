@@ -1,8 +1,9 @@
 import { CalendarDays, MailCheck, Store, Users } from 'lucide-react';
 import { useState } from 'react';
-import { locations } from '../data/siteData.js';
+import { useSite } from '../context/SiteContext.jsx';
 
 export default function ReservationForm() {
+  const { locations } = useSite();
   const [sent, setSent] = useState(false);
 
   function handleSubmit(event) {
