@@ -64,8 +64,10 @@ cd backend
 npm install
 docker compose up -d              # levanta PostgreSQL local (puerto 5432)
 npx prisma migrate dev            # aplica migraciones (desarrollo)
+npm run seed                      # datos de desarrollo (usuarios + contenido)
 npm run dev                       # desarrollo (tsx watch)
 npm run build && npm start        # producción
+npm test                          # tests de integración
 ```
 
 Comandos Prisma:
@@ -76,7 +78,18 @@ npx prisma generate
 npx prisma migrate dev
 npx prisma migrate deploy
 npx prisma studio
+npx prisma db seed
 ```
+
+### Autenticación y roles
+
+- Access token JWT + refresh token en cookie `HttpOnly` (revocable).
+- Roles: `ADMIN` (acceso total) y `EDITOR` (gestiona contenido, no usuarios).
+- Credenciales de desarrollo (cambiar antes de producción):
+  - `admin@example.com` / `Admin123!`
+  - `editor@example.com` / `Editor123!`
+
+Endpoints principales: `/api/auth/*`, `/api/users`, `/api/categories`, `/api/products`, `/api/locations`, `/api/promotions`, `/api/gallery`. Ver `backend/README.md` para el detalle completo.
 
 ### Health check
 
@@ -103,6 +116,12 @@ NODE_ENV=development
 PORT=3000
 DATABASE_URL=postgresql://postgres:postgres@localhost:5432/karnes_db?schema=public
 CORS_ORIGIN=*
+
+JWT_ACCESS_SECRET=...
+JWT_REFRESH_SECRET=...
+ACCESS_TOKEN_EXPIRES_IN=15m
+REFRESH_TOKEN_EXPIRES_IN=7d
+REFRESH_COOKIE_NAME=refreshToken
 ```
 
 Nunca subir `.env` a GitHub.
@@ -115,4 +134,4 @@ Nunca subir `.env` a GitHub.
 
 ## Modelos de datos (Prisma)
 
-`User`, `Category`, `Product`, `Location`, `Promotion`, `Gallery`. Ver `backend/prisma/schema.prisma`.
+`User`, `RefreshToken`, `Category`, `Product`, `Location`, `Promotion`, `Gallery`. Ver `backend/prisma/schema.prisma`.

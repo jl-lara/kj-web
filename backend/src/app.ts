@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
+import cookieParser from 'cookie-parser';
 import { env } from './config/env';
 import routes from './routes';
 import { rateLimiter } from './middleware/rateLimiter';
@@ -14,7 +15,7 @@ export function createApp(): express.Express {
   app.use(helmet());
 
   if (env.corsOrigin === '*') {
-    app.use(cors());
+    app.use(cors({ credentials: true, origin: true }));
   } else {
     app.use(
       cors({
@@ -26,12 +27,16 @@ export function createApp(): express.Express {
 
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
+  app.use(cookieParser());
 
   if (env.nodeEnv !== 'test') {
     app.use(morgan('dev'));
   }
 
-  app.use('/api', rateLimiter, routes);
+  if (env.nodeEnv !== 'test') {
+    app.use('/api', rateLimiter);
+  }
+  app.use('/api', routes);
 
   app.use(notFound);
   app.use(errorHandler);
